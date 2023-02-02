@@ -12,6 +12,9 @@ const App = () => {
             <li>
               <Link to={`/signup`}>Sign up</Link>
             </li>
+            <li>
+              <Link to={`/login`}>Log in</Link>
+            </li>
           </ul>
         </nav>
       </div>

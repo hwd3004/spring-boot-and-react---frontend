@@ -1,4 +1,5 @@
 interface User {
+  [key: string]: any;
   id?: number;
   username?: string;
   password?: string;

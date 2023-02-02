@@ -3,42 +3,60 @@ import User from "../../interfaces/user.interface";
 import React from "react";
 import axiosInstance from "../../modules/axiosInstance";
 import MutationResponse from "../../interfaces/MutationResponse.interface";
-import { AxiosResponse } from "axios";
+import { AxiosError, AxiosResponse } from "axios";
 
 const Signup = () => {
   const [userValues, setUserValues] = useState<User>({});
-  const [mutationResponse, setMutationResponse] = useState<MutationResponse<User>>({
-    data: {},
+  const [mutationResponse, setMutationResponse] = useState<MutationResponse<null>>({
+    data: null,
     message: "",
     success: false,
   });
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+    let response: AxiosResponse<MutationResponse<null>>;
 
-    const formData = new FormData();
+    try {
+      event.preventDefault();
 
-    const { username, password, confirmPassword, email, confirmEmail, image } = userValues;
+      const formData = new FormData();
 
-    username && formData.append("username", username);
-    password && formData.append("password", password);
-    confirmPassword && formData.append("confirmPassword", confirmPassword);
-    email && formData.append("email", email);
-    confirmEmail && formData.append("confirmEmail", confirmEmail);
-    image && formData.append("image", image);
+      const { username, password, confirmPassword, email, confirmEmail, image } = userValues;
 
-    // 자바스크립트로 개발 혹은 타입스크립트여도 유연하게 개발한다면
-    // for (const key in userValues) {
-    //   formData.append(key, userValues[key]);
-    // }
+      username && formData.append("username", username);
+      password && formData.append("password", password);
+      confirmPassword && formData.append("confirmPassword", confirmPassword);
+      email && formData.append("email", email);
+      confirmEmail && formData.append("confirmEmail", confirmEmail);
+      image && formData.append("image", image);
 
-    const response = await axiosInstance.post<MutationResponse<User>>("/users/signup", userValues);
-    console.log(response);
+      // 자바스크립트로 개발 혹은 타입스크립트여도 유연하게 개발한다면
+      // for (const key in userValues) {
+      //   formData.append(key, userValues[key]);
+      // }
 
-    onComplete(response);
+      response = await axiosInstance.post<MutationResponse<null>>("/users/signup", userValues);
+
+      setMutationResponse(response.data);
+
+      onComplete(response);
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        response = error.response as AxiosResponse<MutationResponse<null>>;
+        setMutationResponse(response.data);
+      }
+
+      if (error instanceof TypeError) {
+        setMutationResponse({
+          data: null,
+          message: "서버가 응답하지 않습니다. 잠시 후 다시 시도해주세요.",
+          success: false,
+        });
+      }
+    }
   };
 
-  const onComplete = (response: AxiosResponse<MutationResponse<User>, any>) => {
+  const onComplete = (response: AxiosResponse<MutationResponse<null>>) => {
     setMutationResponse(response.data);
     console.log(response.data);
   };
@@ -93,7 +111,9 @@ const Signup = () => {
           </small>
         </div>
 
-        <button className="btn btn-raised btn-primary">Submit</button>
+        <button type="submit" className="btn btn-raised btn-primary">
+          Submit
+        </button>
       </form>
 
       <br />

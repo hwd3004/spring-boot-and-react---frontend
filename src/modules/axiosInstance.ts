@@ -4,7 +4,7 @@ const BACKEND_ROOT_ENDPOINT = "http://localhost:8080/api";
 
 const axiosInstance = axios.create({
   baseURL: BACKEND_ROOT_ENDPOINT,
-  // timeout: 1000,
+  timeout: 2000,
   headers: {
     "Content-Type": "application/json",
   },
